@@ -62,6 +62,10 @@ const loginUser = async (req, res, next) => {
     let projection = { isDeleted: 0 };
     const user = await User.getUserByEmail(email, projection);
 
+    if (user.error?.statusCode === 404) {
+      throwError("FAILED", 401, "Invalid credentials", "0x000A80");
+    }
+
     if (user.status === "FAILED") {
       throwError(
         user.status,
@@ -74,7 +78,7 @@ const loginUser = async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.data.password);
 
     if (!isMatch) {
-      throwError("FAILED", 401, "Invalid credentials", "0x000A05");
+      throwError("FAILED", 401, "Invalid credentials", "0x000A81");
     }
 
     let role = user.data.isAdmin ? "ADMIN" : "USER";

@@ -7,6 +7,7 @@
 const notFound = (req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
   error.statusCode = 404;
+  error.status = "ROUTE NOT FOUND";
   next(error);
 };
 

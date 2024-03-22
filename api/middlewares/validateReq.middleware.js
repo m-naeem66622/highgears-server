@@ -1,6 +1,9 @@
 // this middleware takes in input schema and schema scope (body,
 // params) and returns a validation function which validates the
 // schema upon invocation
+
+const imagesCleanup = require("../utils/imagesCleanup");
+
 /**
  * Validates the request data against the input schema based on the schema scope.
  * @param {object} inputSchema - The input schema to validate against.
@@ -36,6 +39,9 @@ const validateRequest = (inputSchema, schemaScope) => {
     } catch (error) {
       // this code runs in case the incoming data's validation fails against
       // defined schema
+
+      // Images Cleanup in multipart/form if validations failed
+      req.files?.length && imagesCleanup(req.files?.map((file) => file.path));
 
       let errorDescription = {};
       error.details.map((detail) => {

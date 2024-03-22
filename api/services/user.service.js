@@ -111,7 +111,7 @@ const updateUserById = async (userId, update, options = {}) => {
       };
     }
   } catch (error) {
-    throwError("FAILED", 422, error.message, "0x000A10");
+    throwError("FAILED", 422, error.message, "0x000A0A");
   }
 };
 
@@ -133,13 +133,13 @@ const deleteUserById = async (userId, options = {}) => {
         status: "FAILED",
         error: {
           statusCode: 404,
-          identifier: "0x000A11",
+          identifier: "0x000A0B",
           message: "User not found",
         },
       };
     }
   } catch (error) {
-    throwError("FAILED", 422, error.message, "0x000A12");
+    throwError("FAILED", 422, error.message, "0x000A0C");
   }
 };
 
