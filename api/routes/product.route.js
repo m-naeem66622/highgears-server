@@ -28,7 +28,8 @@ router.get(
 // Route for getting a single product by id
 router.get(
   "/:id",
-  validate(Validation.getByIdSchema, "PARAMS"),
+  validate(Validation.getByIdSchema.PARAMS, "PARAMS"),
+  validate(Validation.getByIdSchema.QUERY, "QUERY"),
   Controller.getProductById
 );
 
@@ -47,7 +48,7 @@ router.delete(
   "/:id",
   authenticate,
   Authorize.isAdmin,
-  validate(Validation.getByIdSchema, "PARAMS"),
+  validate(Validation.getByIdSchema.PARAMS, "PARAMS"),
   Controller.deleteProduct
 );
 

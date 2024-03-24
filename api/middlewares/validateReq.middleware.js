@@ -54,7 +54,7 @@ const validateRequest = (inputSchema, schemaScope) => {
       return res.status(400).json({
         status: "FAILED",
         message: "Data Validation Failed",
-        error: errorDescription,
+        errors: errorDescription,
       });
     }
   };
@@ -141,7 +141,7 @@ const validateRequest = (inputSchema, schemaScope) => {
       return res.status(400).json({
         status: "FAILED",
         message: "Data Validation Failed",
-        error: errorDescription,
+        errors: errorDescription,
       });
     }
   };

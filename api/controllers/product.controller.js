@@ -48,6 +48,7 @@ const getProducts = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
 
     const {
+      name,
       available_colors,
       available_sizes,
       queryType,
@@ -58,11 +59,11 @@ const getProducts = async (req, res, next) => {
     delete restQuery.page;
     delete restQuery.limit;
 
-    console.log("queryType", req.query.queryType);
-
     const projection =
       queryType === "card"
-        ? PROJECTION.card
+        ? PROJECTION.product.card
+        : queryType === "list"
+        ? PROJECTION.product.list
         : queryType === "table"
         ? include.reduce(
             (acc, key) => {
@@ -72,12 +73,11 @@ const getProducts = async (req, res, next) => {
             {
               images: { $slice: 1 },
               name: 1,
-              currency: 1,
               selling_price: 1,
               in_stock: 1,
             }
           )
-        : PROJECTION.default;
+        : PROJECTION.product.default;
     const filter = { isDeleted: false, ...restQuery };
 
     if (available_colors?.length > 0) {
@@ -90,6 +90,14 @@ const getProducts = async (req, res, next) => {
       filter.available_sizes = {
         $in: available_sizes.map((size) => new RegExp(size, "i")),
       };
+    }
+
+    if (name) {
+      const keywords = name.split(" ").filter(Boolean);
+      const searchPattern = keywords
+        .map((keyword) => `(?=.*${keyword})`)
+        .join("");
+      filter.name = { $regex: searchPattern, $options: "i" };
     }
 
     const totalProducts = await Product.count(filter);
@@ -130,9 +138,15 @@ const getProducts = async (req, res, next) => {
 const getProductById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { queryType } = req.query;
 
     const filter = { _id: id };
-    const projection = { isDeleted: 0, admin: 0 };
+    let projection = { isDeleted: 0, admin: 0 };
+
+    if (queryType === "list") {
+      projection = { _id: 1, name: 1, in_stock: 1 };
+    }
+
     const product = await Product.getSingle(filter, projection);
 
     if (product.status === "FAILED") {

@@ -48,13 +48,13 @@ const get = async (filter, projection, page, limit, options) => {
         status: "FAILED",
         error: {
           statusCode: 404,
-          identifier: "0x000B04",
+          identifier: "0x000B03",
           message: "No products found",
         },
       };
     }
   } catch (error) {
-    throwError("FAILED", 422, error.message, "0x000B03");
+    throwError("FAILED", 422, error.message, "0x000B04");
   }
 };
 
@@ -73,13 +73,13 @@ const getSingle = async (filter, projection) => {
         status: "FAILED",
         error: {
           statusCode: 404,
-          identifier: "0x000B03",
+          identifier: "0x000B05",
           message: "Product not found",
         },
       };
     }
   } catch (error) {
-    throwError("FAILED", 422, error.message, "0x000B04");
+    throwError("FAILED", 422, error.message, "0x000B06");
   }
 };
 
@@ -99,13 +99,13 @@ const update = async (productId, update, options = {}) => {
         status: "FAILED",
         error: {
           statusCode: 404,
-          identifier: "0x000B05",
+          identifier: "0x000B07",
           message: "Product not found",
         },
       };
     }
   } catch (error) {
-    throwError("FAILED", 422, error.message, "0x000B06");
+    throwError("FAILED", 422, error.message, "0x000B08");
   }
 };
 
@@ -125,13 +125,13 @@ const deleteOne = async (productId, options = {}) => {
         status: "FAILED",
         error: {
           statusCode: 404,
-          identifier: "0x000B07",
+          identifier: "0x000B09",
           message: "Product not found",
         },
       };
     }
   } catch (error) {
-    throwError("FAILED", 422, error.message, "0x000B08");
+    throwError("FAILED", 422, error.message, "0x000B0A");
   }
 };
 

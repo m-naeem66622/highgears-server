@@ -14,13 +14,8 @@ const createSchema = Joi.object({
     }),
   selling_price: Joi.number().min(0).required(),
   original_price: Joi.number().min(0).required(),
-  currency: Joi.string()
-    .trim()
-    .length(3)
-    .uppercase()
-    .required()
-    .messages({ "string.length": "Currency must be ISO 4217 standard" }),
   brand: Joi.string().trim().required(),
+  shipping_price: Joi.number().min(0).required(),
   available_colors: Joi.array().items(Joi.string().required()).required(),
   available_sizes: Joi.array().items(Joi.string().required()).required(),
   in_stock: Joi.boolean(),
@@ -34,7 +29,7 @@ const getSchema = Joi.object({
   name: Joi.string().trim(),
   price_range: Joi.array().items(Joi.number().min(0)).length(2),
   brand: Joi.string().trim(),
-  queryType: Joi.string().trim().valid("card", "default", "table"),
+  queryType: Joi.string().trim().valid("list", "card", "default", "table"),
   include: Joi.array().items(
     Joi.string()
       .trim()
@@ -43,10 +38,10 @@ const getSchema = Joi.object({
         "description",
         "selling_price",
         "original_price",
-        "currency",
         "brand",
         "available_colors",
         "available_sizes",
+        "shipping_price",
         "avg_rating",
         "reviews_count",
         "in_stock"
@@ -54,9 +49,14 @@ const getSchema = Joi.object({
   ),
 });
 
-const getByIdSchema = Joi.object({
-  id: Joi.string().length(24).hex().required(),
-});
+const getByIdSchema = {
+  PARAMS: Joi.object({
+    id: Joi.string().length(24).hex().required(),
+  }),
+  QUERY: Joi.object({
+    queryType: Joi.string().trim().valid("list", "card", "default"),
+  }),
+};
 
 const updateSchema = Joi.object({
   images: Joi.array().items(Joi.string()).min(1),
@@ -71,9 +71,7 @@ const updateSchema = Joi.object({
     }),
   selling_price: Joi.number().min(0),
   original_price: Joi.number().min(0),
-  currency: Joi.string().trim().length(3).uppercase().messages({
-    "string.length": "Currency must be ISO 4217 standard",
-  }),
+  shipping_price: Joi.number().min(0),
   brand: Joi.string().trim(),
   available_colors: Joi.array().items(Joi.string().required()),
   available_sizes: Joi.array().items(Joi.string().required()),
