@@ -22,6 +22,7 @@ const getSchema = Joi.object({
   name: Joi.string().trim(),
   slug: Joi.string().trim(),
   queryType: Joi.string().valid("default", "table", "card", "list"),
+  showOnHomepage: Joi.boolean(),
 });
 
 const getBySlugSchema = {
