@@ -48,6 +48,10 @@ const PROJECTION = {
       "in_stock",
     ],
   },
+  order: {
+    nestedProduct: "images name",
+    nestedUser: "firstName lastName phoneNumber",
+  },
 };
 
 module.exports = { ALLOWED_VALIDATION_SCHEMA_SCOPES, PROJECTION };

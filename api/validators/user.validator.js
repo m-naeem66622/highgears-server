@@ -17,7 +17,7 @@ const registerSchema = Joi.object({
     country: Joi.string().trim().required(),
     state: Joi.string().trim().required(),
     city: Joi.string().trim().required(),
-    street: Joi.string().trim(),
+    street: Joi.string().trim().optional(),
     zipCode: Joi.string().trim().required(),
   }).required(),
   phoneNumber: Joi.object({

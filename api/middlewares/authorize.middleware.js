@@ -27,4 +27,18 @@ const isUser = (req, res, next) => {
   next();
 };
 
-module.exports = { isAdmin, isUser };
+const isAdminOrUser = (req, res, next) => {
+  if (req.user.role !== "ADMIN" && req.user.role !== "USER") {
+    return res.status(403).json({
+      status: "FAILED",
+      error: {
+        statusCode: 403,
+        message: "Forbidden",
+        identifier: "0x001302",
+      },
+    });
+  }
+  next();
+};
+
+module.exports = { isAdmin, isUser, isAdminOrUser };

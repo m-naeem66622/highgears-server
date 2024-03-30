@@ -9,8 +9,14 @@ const productSchema = new mongoose.Schema(
     selling_price: { type: Number, required: true },
     original_price: { type: Number, required: true },
     brand: { type: String, trim: true, required: true },
-    available_colors: { type: [String], required: true },
-    available_sizes: { type: [String], required: true },
+    available_colors: {
+      type: [{ type: String, uppercase: true }],
+      required: true,
+    },
+    available_sizes: {
+      type: [{ type: String, uppercase: true }],
+      required: true,
+    },
     shipping_price: { type: Number, required: true },
     avg_rating: { type: Number, default: 0 },
     reviews_count: { type: Number, default: 0 },
