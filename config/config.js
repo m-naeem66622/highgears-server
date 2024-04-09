@@ -50,7 +50,7 @@ const PROJECTION = {
   },
   order: {
     nestedProduct: "images name",
-    nestedUser: "firstName lastName phoneNumber",
+    nestedUser: "firstName lastName email phoneNumber",
   },
 };
 

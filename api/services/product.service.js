@@ -35,7 +35,7 @@ const count = async (filter) => {
 };
 
 // GetProducts
-const get = async (filter, projection, page, limit, options) => {
+const get = async (filter, projection, page=1, limit, options) => {
   try {
     const products = await Product.find(filter, projection, options)
       .skip((page - 1) * limit)

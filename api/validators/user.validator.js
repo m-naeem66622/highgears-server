@@ -56,7 +56,7 @@ const updateProfileSchema = Joi.object({
     number: Joi.string().trim().required(),
     format: Joi.string().trim().required(),
   }).required(),
-  password: Joi.string().required(),
+  password: Joi.string().trim(),
   oldPassword: Joi.string()
     .when("password", {
       is: Joi.exist(),
@@ -64,6 +64,7 @@ const updateProfileSchema = Joi.object({
       otherwise: Joi.optional(),
     })
     .invalid(Joi.ref("password"))
+    .label("password")
     .messages({
       "any.invalid": "password and oldPassword must not be same",
     }),

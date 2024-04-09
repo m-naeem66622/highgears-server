@@ -1,7 +1,9 @@
+const axios = require("axios");
 const { PROJECTION } = require("../../config/config");
 const Order = require("../services/order.service");
 const Product = require("../services/product.service");
 const { throwError } = require("../utils/error.util");
+const generateMongoId = require("../utils/generateMongoId");
 
 /**
  * @desc    Create a new order
@@ -113,15 +115,38 @@ const checkout = async (req, res, next) => {
       }
     }
 
-    console.log("itemsCountWithShipping: ", itemsCountWithShipping);
+    if (itemsCountWithShipping)
+      discountedPrice = (discountedPrice / itemsCountWithShipping).toFixed(2);
 
-    if (itemsCountWithShipping) discountedPrice /= itemsCountWithShipping;
+    const totalPrice = 1;
+    const orderId = generateMongoId();
+    let payfastAcessToken = null;
+    try {
+      const response = await axios.post(
+        `https://ipguat.apps.net.pk/Ecommerce/api/Transaction/GetAccessToken?MERCHANT_ID=${process.env.PAYFAST_MERCHANT_ID}&SECURED_KEY=${process.env.PAYFAST_SECURED_KEY}&BASKET_ID=${orderId}&TXNAMT=${totalPrice}`
+      );
 
-    const totalPrice = itemsPrice + shippingPrice - discountedPrice;
+      if (response.data.ACCESS_TOKEN) {
+        payfastAcessToken = response.data.ACCESS_TOKEN;
+      }
+    } catch (error) {
+      console.log("PayFast Token Error: ", error);
+      return res.status(422).json({ status: "FAILED", error: error.message });
+    }
 
     res.json({
       status: "SUCCESS",
       data: {
+        formParameters: {
+          MERCHANT_ID: process.env.PAYFAST_MERCHANT_ID,
+          MERCHANT_NAME: process.env.PAYFAST_MERCHANT_NAME,
+          TOKEN: payfastAcessToken,
+          PROCCODE: "00",
+          TXNAMT: totalPrice,
+          CURRENCY_CODE: "USD",
+          BASKET_ID: orderId,
+        },
+        _id: orderId,
         cartItems: products,
         itemsPrice,
         shippingPrice,
@@ -142,6 +167,7 @@ const getOrders = async (req, res, next) => {
 
     const filter = {};
     if (req.user.role === "USER") filter.user = req.user._id;
+    if (req.query.orderStatus) filter.orderStatus = req.query.orderStatus;
 
     let projection =
       queryType === "table"
@@ -158,8 +184,6 @@ const getOrders = async (req, res, next) => {
             user: PROJECTION.order.nestedUser,
             // products: PROJECTION.order.nestedProduct,
           };
-
-    console.log("Projection:", projection);
 
     const totalOrders = await Order.count(filter);
     const orders = await Order.get(filter, projection, page, limit);
@@ -191,4 +215,34 @@ const getOrders = async (req, res, next) => {
   }
 };
 
-module.exports = { createOrder, checkout, getOrders };
+const getSingleOrder = async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    const filter = { _id: orderId, user: req.user._id };
+
+    let projection = {
+      root: {},
+      user: PROJECTION.order.nestedUser,
+    };
+
+    const order = await Order.getSingle(filter, projection);
+
+    if (order.status === "FAILED") {
+      throwError(
+        order.status,
+        order.error.statusCode,
+        order.error.message,
+        order.error.identifier
+      );
+    }
+
+    res.json({
+      status: "SUCCESS",
+      data: order.data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createOrder, checkout, getOrders, getSingleOrder };

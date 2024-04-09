@@ -59,7 +59,11 @@ const updateUserProfile = async (req, res, next) => {
       );
 
       if (!isPasswordCorrect) {
-        throwError("FAILED", 401, "Incorrect Credentials", "0x001001");
+        return res.status(400).json({
+          status: "FAILED",
+          message: "Data Validation Failed",
+          errors: { oldPassword: "Old password is incorrect" },
+        });
       }
     }
 
@@ -77,6 +81,7 @@ const updateUserProfile = async (req, res, next) => {
 
     res.status(200).json({
       status: "SUCCESS",
+      message: "Profile updated successfully",
       data: updatedUser.data,
     });
   } catch (error) {

@@ -60,4 +60,54 @@ const get = async (filter, projection, page = 1, limit, options) => {
   }
 };
 
-module.exports = { create, count, get };
+// GetOrderById
+const getSingle = async (filter, projection) => {
+  try {
+    const order = await Order.findOne(filter, projection.root)
+      .populate("user", projection.user)
+      .populate("products.product");
+
+    if (order) {
+      return { status: "SUCCESS", data: order };
+    } else {
+      return {
+        status: "FAILED",
+        error: {
+          statusCode: 404,
+          identifier: "0x000D05",
+          message: "Order not found",
+        },
+      };
+    }
+  } catch (error) {
+    throwError("FAILED", 422, error.message, "0x000D06");
+  }
+};
+
+// UpdateOrder
+const update = async (filter, update, options = {}) => {
+  try {
+    const updatedOrder = await Order.findOneAndUpdate(
+      filter,
+      { $set: update },
+      { new: true, ...options }
+    );
+
+    if (updatedOrder) {
+      return { status: "SUCCESS", data: updatedOrder };
+    } else {
+      return {
+        status: "FAILED",
+        error: {
+          statusCode: 404,
+          identifier: "0x000D07",
+          message: "Order not found",
+        },
+      };
+    }
+  } catch (error) {
+    throwError("FAILED", 422, error.message, "0x000D08");
+  }
+};
+
+module.exports = { create, count, get, getSingle, update };

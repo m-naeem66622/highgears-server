@@ -34,4 +34,13 @@ router.get(
   Controller.getOrders
 );
 
+// Route for getting a single order
+router.get(
+  "/:id",
+  authenticate,
+  validate(Validation.getSingleSchema, "PARAMS"),
+  Authorize.isAdminOrUser,
+  Controller.getSingleOrder
+);
+
 module.exports = router;

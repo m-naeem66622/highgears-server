@@ -18,9 +18,22 @@ const orderSchema = new mongoose.Schema(
     ],
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
+    shippingAddress: {
+      country: { type: String, required: true },
+      state: { type: String, required: true },
+      city: { type: String, required: true },
+      street: { type: String, default: "" },
+      zipCode: { type: String, required: true },
+    },
     discountedPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
     paymentMethod: { type: String, required: true },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PAID"],
+      default: "PENDING",
+      uppercase: true,
+    },
     orderStatus: {
       type: String,
       enum: ["PENDING", "PROCESSING", "SHIPPED", "COMPLETED", "CANCELLED"],

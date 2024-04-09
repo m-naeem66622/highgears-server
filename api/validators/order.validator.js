@@ -1,6 +1,7 @@
 const Joi = require("joi");
 
 const createOrder = Joi.object().keys({
+  _id: Joi.string().length(24).hex().required(),
   products: Joi.array().items(
     Joi.object().keys({
       product: Joi.string().length(24).hex().required(),
@@ -22,6 +23,9 @@ const createOrder = Joi.object().keys({
     zipCode: Joi.string().trim().required(),
   }).required(),
   paymentMethod: Joi.string().required(),
+  paymentStatus: Joi.string()
+    .uppercase({ force: true })
+    .valid("PENDING", "PAID"),
 });
 
 const checkoutSchema = Joi.object().keys({
@@ -35,9 +39,16 @@ const checkoutSchema = Joi.object().keys({
   ),
 });
 
+const getSingleSchema = Joi.object({
+  id: Joi.string().length(24).hex().required(),
+});
+
 const getSchema = Joi.object({
   page: Joi.number().min(1),
   limit: Joi.number().min(1).max(30),
+  orderStatus: Joi.string()
+    .uppercase({ force: true })
+    .valid("PENDING", "PROCESSING", "SHIPPED", "COMPLETED", "CANCELLED"),
   exclude: Joi.array().items(
     "user",
     "products",
@@ -92,4 +103,4 @@ const getSchema = Joi.object({
   queryType: Joi.string().valid("default", "table"),
 });
 
-module.exports = { createOrder, checkoutSchema, getSchema };
+module.exports = { createOrder, checkoutSchema, getSchema, getSingleSchema };
