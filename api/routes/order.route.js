@@ -43,4 +43,17 @@ router.get(
   Controller.getSingleOrder
 );
 
+// Route for updating an order
+router.put(
+  "/:id",
+  authenticate,
+  validate(Validation.updateSchema, "BODY"),
+  validate(Validation.getSingleSchema, "PARAMS"),
+  Authorize.isAdminOrUser,
+  Controller.updateOrder
+);
+
+// // Route to listen from PayFast
+// router.post("/payfast/checkout", Controller.payfastCheckout);
+
 module.exports = router;

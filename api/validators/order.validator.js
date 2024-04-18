@@ -103,4 +103,26 @@ const getSchema = Joi.object({
   queryType: Joi.string().valid("default", "table"),
 });
 
-module.exports = { createOrder, checkoutSchema, getSchema, getSingleSchema };
+const updateSchema = Joi.object({
+  orderStatus: Joi.string()
+    .uppercase()
+    .when("$role", {
+      is: "ADMIN",
+      then: Joi.valid(
+        "PENDING",
+        "PROCESSING",
+        "SHIPPED",
+        "COMPLETED",
+        "CANCELLED"
+      ).required(),
+      otherwise: Joi.valid("CANCELLED").required(),
+    }),
+});
+
+module.exports = {
+  createOrder,
+  checkoutSchema,
+  getSingleSchema,
+  getSchema,
+  updateSchema,
+};

@@ -38,6 +38,11 @@ const createOrder = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Checkout the cart
+ * @route   POST /api/orders/checkout
+ * @access  Private/User
+ */
 const checkout = async (req, res, next) => {
   try {
     const productIds = req.body.products.map((product) => product.product);
@@ -119,6 +124,9 @@ const checkout = async (req, res, next) => {
       discountedPrice = (discountedPrice / itemsCountWithShipping).toFixed(2);
 
     const totalPrice = 1;
+    // const totalPrice = itemsPrice + shippingPrice - discountedPrice;
+
+    // Get Access Token from PayFast
     const orderId = generateMongoId();
     let payfastAcessToken = null;
     try {
@@ -130,9 +138,21 @@ const checkout = async (req, res, next) => {
         payfastAcessToken = response.data.ACCESS_TOKEN;
       }
     } catch (error) {
-      console.log("PayFast Token Error: ", error);
       return res.status(422).json({ status: "FAILED", error: error.message });
     }
+
+    // const fetchedProducts = products.data.map((product) => {
+    //   const item = req.body.products.find(
+    //     (item) => item.product.toString() === product._id.toString()
+    //   );
+
+    //   return {
+    //     quantity: item.quantity,
+    //     size: item.size,
+    //     color: item.color,
+    //     ...product,
+    //   };
+    // });
 
     res.json({
       status: "SUCCESS",
@@ -158,7 +178,11 @@ const checkout = async (req, res, next) => {
     next(error);
   }
 };
-
+/**
+ * @desc    Get all orders
+ * @route   GET /api/orders
+ * @access  Private User/Admin
+ */
 const getOrders = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -215,10 +239,16 @@ const getOrders = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Get single order
+ * @route   GET /api/orders/:id
+ * @access  Private User/Admin
+ */
 const getSingleOrder = async (req, res, next) => {
   try {
     const orderId = req.params.id;
-    const filter = { _id: orderId, user: req.user._id };
+    const filter = { _id: orderId };
+    if (req.user.role === "USER") filter.user = req.user._id;
 
     let projection = {
       root: {},
@@ -245,4 +275,42 @@ const getSingleOrder = async (req, res, next) => {
   }
 };
 
-module.exports = { createOrder, checkout, getOrders, getSingleOrder };
+/**
+ * @desc    Update order status
+ * @route   PUT /api/orders/:id
+ * @access  Private User/Admin
+ */
+const updateOrder = async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    const filter = { _id: orderId };
+    if (req.user.role === "USER") filter.user = req.user._id;
+
+    const order = await Order.update(filter, req.body);
+
+    if (order.status === "FAILED") {
+      throwError(
+        order.status,
+        order.error.statusCode,
+        order.error.message,
+        order.error.identifier
+      );
+    }
+
+    res.json({
+      status: "SUCCESS",
+      message: "Order status updated successfully",
+      data: order.data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  createOrder,
+  checkout,
+  getOrders,
+  getSingleOrder,
+  updateOrder,
+};
