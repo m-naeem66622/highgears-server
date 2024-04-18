@@ -15,7 +15,6 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode ? err.statusCode : 500;
 
   res.status(statusCode).json({
-    // TODO: Implement a status for Path Not Found
     status: err.status ? err.status : "INTERNAL SERVER ERROR",
     error: {
       message: err.message,

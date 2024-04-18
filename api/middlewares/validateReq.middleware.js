@@ -22,7 +22,7 @@ const validateRequest = (inputSchema, schemaScope) => {
         return res.status(400).json({
           status: "FAILED",
           message: "Data Validation Failed",
-          error: {
+          errors: {
             error: `Incoming request body can't be empty.`,
           },
         });
@@ -112,7 +112,7 @@ const validateRequest = (inputSchema, schemaScope) => {
         return res.status(400).json({
           status: "FAILED",
           message: "Data Validation Failed",
-          error: {
+          errors: {
             error: `Incoming request path params can't be empty.`,
           },
         });

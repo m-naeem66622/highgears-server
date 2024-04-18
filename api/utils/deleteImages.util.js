@@ -12,13 +12,8 @@ function deleteImages(imagesToDelete) {
     );
 
     fs.rename(sourcePath, destinationPath, (err) => {
-      console.log("Deleting image:", sourcePath);
       if (err) {
         fs.appendFileSync(`logs/files-not-moved.txt`, sourcePath + "\n");
-        console.log("deleteImages -> failed while moving picture");
-        console.error("Error while moving image to deleted_products:", err);
-      } else {
-        console.log("Image moved to deleted_products successfully.");
       }
     });
   });

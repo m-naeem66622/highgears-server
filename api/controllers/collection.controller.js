@@ -56,7 +56,12 @@ const getCollections = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const queryType = req.query.queryType || "default";
-    const showOnHomepage = req.query.showOnHomepage === "true";
+    const showOnHomepage =
+      req.query.showOnHomepage === "true"
+        ? true
+        : req.query.showOnHomepage === "false"
+        ? false
+        : null;
 
     const nestedProjection =
       queryType === "card"
@@ -65,7 +70,9 @@ const getCollections = async (req, res, next) => {
         ? []
         : PROJECTION.collection.nested;
 
-    const filter = { isDeleted: false, showOnHomepage };
+    const filter = { isDeleted: false };
+    if (showOnHomepage !== null) filter.showOnHomepage = showOnHomepage;
+
     const totalCollections = await Collection.count({ isDeleted: false });
     const collections = await Collection.get(
       filter,
