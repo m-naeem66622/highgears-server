@@ -12,7 +12,7 @@ const createSchema = Joi.object({
         "Slug can only contain lowercase letters, numbers and hyphens",
     }),
   description: Joi.string().trim().required(),
-  products: Joi.array().items(Joi.string().required()),
+  products: Joi.array().items(Joi.string().length(24).hex()),
   showOnHomepage: Joi.boolean(),
 });
 
